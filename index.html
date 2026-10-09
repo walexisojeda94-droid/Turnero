@@ -230,7 +230,7 @@
             const legalTexts = {
                 privacy: `
                     <h3 class="text-lg font-bold mb-3 text-gray-800">Política de Privacidad</h3>
-                    <p class="mb-2"><strong>Responsable del tratamiento:</strong> [Tu Nombre o Razón Social / CUIT] - Buenos Aires, Argentina.</p>
+                    <p class="mb-2"><strong>Responsable del tratamiento:</strong> Celinaaguirre.Ph - Buenos Aires, Argentina.</p>
                     <p class="mb-2"><strong>Datos recolectados:</strong> Nombre, Apellido, Correo electrónico y Teléfono de contacto.</p>
                     <p class="mb-2"><strong>Finalidad:</strong> Gestionar la reserva de la sesión fotográfica, confirmar la disponibilidad vía WhatsApp y realizar el seguimiento del servicio solicitado.</p>
                     <p class="mb-2"><strong>Base legal:</strong> Consentimiento del usuario al completar y enviar el formulario de reserva.</p>
@@ -246,7 +246,7 @@
                 `,
                 cookies: `
                     <h3 class="text-lg font-bold mb-3 text-gray-800">Política de Cookies</h3>
-                    <p class="mb-2">Este sitio web **únicamente utiliza cookies y almacenamiento local strictly necesarios y técnicos** para permitir el correcto funcionamiento de la navegación y la gestión por pasos del formulario de reserva.</p>
+                    <p class="mb-2">Este sitio web **únicamente utiliza cookies y almacenamiento local estrictamente necesarios y técnicos** para permitir el correcto funcionamiento de la navegación y la gestión por pasos del formulario de reserva.</p>
                     <p class="mb-2"><strong>¿Utilizamos cookies de seguimiento o publicidad?</strong> No. No empleamos cookies de análisis, rastreo publicitario ni almacenamiento de terceros con fines comerciales.</p>
                     <p class="mb-2">Al no utilizar cookies de seguimiento ni marketing, no se requiere la aceptación de un banner de cookies comercial conforme a las normativas de privacidad vigentes.</p>
                 `
@@ -291,7 +291,11 @@
                     dateError.textContent = 'Por favor, selecciona una fecha.';
                     return;
                 }
-                const date = new Date(dateInput.value + 'T00:00:00'); 
+                
+                // Parseo de fecha seguro para evitar desfasaje de zona horaria (UTC/Local)
+                const [year, month, day] = dateInput.value.split('-').map(Number);
+                const date = new Date(year, month - 1, day);
+                
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
 
