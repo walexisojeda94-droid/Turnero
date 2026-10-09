@@ -1,0 +1,9 @@
+{
+  "name": "reserva-turnos",
+  "version": "1.0.0",
+  "description": "Sistema de reserva de turnos",
+  "main": "index.html",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.39.0"
+  }
+}
