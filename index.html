@@ -210,7 +210,6 @@
             let selectedDate = null;
             let selectedTime = null;
             let selectedSession = null;
-            let userDetails = {};
 
             const availableSlots = ['15:00 - 17:00', '16:00 - 18:00', '17:00 - 19:00', '18:00 - 20:00'];
             const sessionTypes = [
@@ -219,7 +218,7 @@
                 { name: 'Sesión cumpleaños', emoji: '🎂🎁' }
             ];
 
-            // Configurar fecha mínima seleccionable (bloquea pasados en UI)
+            // Bloquear fechas pasadas en la interfaz de calendario
             const todayStr = new Date().toISOString().split('T')[0];
             dateInput.min = todayStr;
 
@@ -247,7 +246,7 @@
                 `,
                 cookies: `
                     <h3 class="text-lg font-bold mb-3 text-gray-800">Política de Cookies</h3>
-                    <p class="mb-2">Este sitio web **únicamente utiliza cookies y almacenamiento local estrictamente necesarios y técnicos** para permitir el correcto funcionamiento de la navegación y la gestión por pasos del formulario de reserva.</p>
+                    <p class="mb-2">Este sitio web **únicamente utiliza cookies y almacenamiento local strictly necesarios y técnicos** para permitir el correcto funcionamiento de la navegación y la gestión por pasos del formulario de reserva.</p>
                     <p class="mb-2"><strong>¿Utilizamos cookies de seguimiento o publicidad?</strong> No. No empleamos cookies de análisis, rastreo publicitario ni almacenamiento de terceros con fines comerciales.</p>
                     <p class="mb-2">Al no utilizar cookies de seguimiento ni marketing, no se requiere la aceptación de un banner de cookies comercial conforme a las normativas de privacidad vigentes.</p>
                 `
@@ -261,229 +260,4 @@
             }
 
             function closeLegalModal() {
-                document.getElementById('legal-modal').classList.add('hidden');
-            }
-
-            // Eventos modal
-            document.getElementById('close-modal').addEventListener('click', closeLegalModal);
-            document.getElementById('btn-privacy').addEventListener('click', () => openLegalModal('privacy'));
-            document.getElementById('btn-terms').addEventListener('click', () => openLegalModal('terms'));
-            document.getElementById('footer-btn-privacy').addEventListener('click', () => openLegalModal('privacy'));
-            document.getElementById('footer-btn-terms').addEventListener('click', () => openLegalModal('terms'));
-            document.getElementById('footer-btn-cookies').addEventListener('click', () => openLegalModal('cookies'));
-
-            // Cerrar modal al hacer clic en el fondo oscuro
-            document.getElementById('legal-modal').addEventListener('click', (e) => {
-                if (e.target.id === 'legal-modal') {
-                    closeLegalModal();
-                }
-            });
-
-            // --- LÓGICA DE PASOS ---
-            function showStep(stepNumber) {
-                Object.values(steps).forEach(step => step.classList.add('hidden'));
-                if (steps[stepNumber]) {
-                    steps[stepNumber].classList.remove('hidden');
-                }
-            }
-
-            nextToStep2.addEventListener('click', () => {
-                if (!dateInput.value) {
-                    dateError.textContent = 'Por favor, selecciona una fecha.';
-                    return;
-                }
-                const date = new Date(dateInput.value + 'T00:00:00'); 
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-
-                if (date < today) {
-                    dateError.textContent = 'No puedes seleccionar una fecha pasada.';
-                    return;
-                }
-                
-                dateError.textContent = '';
-                selectedDate = date;
-                
-                const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-                selectedDateInfo.textContent = selectedDate.toLocaleDateString('es-ES', dateOptions);
-
-                generateTimeSlots(selectedDate);
-                showStep(2);
-            });
-
-            backToStep1.addEventListener('click', () => {
-                selectedTime = null; 
-                timeError.textContent = '';
-                showStep(1);
-            });
-
-            nextToStep3.addEventListener('click', () => {
-                if (!selectedTime) {
-                    timeError.textContent = 'Por favor, selecciona un horario.';
-                    return;
-                }
-                timeError.textContent = '';
-
-                const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
-                timeSummaryDetails.textContent = `${selectedDate.toLocaleDateString('es-ES', dateOptions)} a las ${selectedTime}.`;
-                
-                generateSessionOptions();
-                showStep(3);
-            });
-
-            backToStep2From3.addEventListener('click', () => {
-                selectedSession = null;
-                sessionError.textContent = '';
-                showStep(2);
-            });
-
-            nextToStep4.addEventListener('click', () => {
-                if (!selectedSession) {
-                    sessionError.textContent = 'Por favor, selecciona el tipo de sesión.';
-                    return;
-                }
-                sessionError.textContent = '';
-                
-                const dateOptions = { weekday: 'long', day: 'numeric', month: 'long' };
-                
-                summaryDetails.textContent = '';
-                const titleLine = document.createElement('div');
-                titleLine.className = 'font-bold';
-                titleLine.textContent = `${selectedSession.name} (${selectedSession.emoji})`;
-                
-                const dateLine = document.createElement('div');
-                dateLine.textContent = `${selectedDate.toLocaleDateString('es-ES', dateOptions)} / ${selectedTime}`;
-                
-                summaryDetails.appendChild(titleLine);
-                summaryDetails.appendChild(dateLine);
-                
-                showStep(4);
-            });
-
-            backToStep3.addEventListener('click', () => {
-                formError.textContent = '';
-                showStep(3);
-            });
-
-            function generateTimeSlots(date) {
-                timeSlotsContainer.textContent = ''; 
-                selectedTime = null; 
-                
-                availableSlots.forEach(slot => {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    button.textContent = slot;
-                    button.className = 'w-full bg-gray-100 text-gray-800 p-3 rounded-lg text-center font-medium cursor-pointer hover:bg-gray-200 transition-colors time-slot';
-                    
-                    button.addEventListener('click', () => {
-                        selectedTime = slot;
-                        timeError.textContent = ''; 
-                        
-                        document.querySelectorAll('.time-slot').forEach(btn => {
-                            btn.classList.remove('bg-blue-600', 'text-white');
-                            btn.classList.add('bg-gray-100', 'text-gray-800');
-                        });
-                        button.classList.add('bg-blue-600', 'text-white');
-                        button.classList.remove('bg-gray-100', 'text-gray-800');
-                    });
-
-                    timeSlotsContainer.appendChild(button);
-                });
-            }
-
-            function generateSessionOptions() {
-                sessionOptionsContainer.textContent = '';
-                selectedSession = null;
-                
-                sessionTypes.forEach(session => {
-                    const button = document.createElement('button');
-                    button.type = 'button';
-                    
-                    const emojiSpan = document.createElement('span');
-                    emojiSpan.className = 'text-2xl mr-2';
-                    emojiSpan.textContent = session.emoji;
-                    
-                    button.appendChild(emojiSpan);
-                    button.appendChild(document.createTextNode(` ${session.name}`));
-                    button.className = 'w-full flex items-center justify-center bg-gray-100 text-gray-800 p-4 rounded-lg font-semibold cursor-pointer hover:bg-gray-200 transition-colors session-option';
-                    
-                    button.addEventListener('click', () => {
-                        selectedSession = session;
-                        sessionError.textContent = ''; 
-                        
-                        document.querySelectorAll('.session-option').forEach(btn => {
-                            btn.classList.remove('bg-pink-600', 'text-white');
-                            btn.classList.add('bg-gray-100', 'text-gray-800');
-                        });
-                        button.classList.add('bg-pink-600', 'text-white');
-                        button.classList.remove('bg-gray-100', 'text-gray-800');
-                    });
-
-                    sessionOptionsContainer.appendChild(button);
-                });
-            }
-
-            bookingForm.addEventListener('submit', (e) => {
-                e.preventDefault(); 
-                
-                const nombre = document.getElementById('nombre').value.trim();
-                const apellido = document.getElementById('apellido').value.trim();
-                const email = document.getElementById('email').value.trim();
-                const telefono = document.getElementById('telefono').value.trim();
-                const aceptoTerminos = document.getElementById('acepto-terminos').checked;
-
-                if (!nombre || !apellido || !email || !telefono) {
-                    formError.textContent = 'Por favor, completa todos los campos.';
-                    return;
-                }
-
-                if (!isValidEmail(email)) {
-                    formError.textContent = 'Ingresá un correo electrónico válido.';
-                    return;
-                }
-
-                if (!isValidPhone(telefono)) {
-                    formError.textContent = 'Ingresá un número de teléfono válido (mínimo 8 dígitos).';
-                    return;
-                }
-
-                if (!aceptoTerminos) {
-                    formError.textContent = 'Debes aceptar los Términos y la Política de Privacidad para continuar.';
-                    return;
-                }
-                
-                formError.textContent = '';
-                userDetails = { nombre, apellido, email, telefono };
-
-                confirmBooking.disabled = true;
-                confirmBooking.textContent = 'Redirigiendo...';
-
-                const dateString = selectedDate.toLocaleDateString('es-ES', { dateStyle: 'full' });
-                
-                let message = `¡Hola! Quiero confirmar la reserva de una sesión de fotos.
-                
-*Tipo de Sesión:* ${selectedSession.name} ${selectedSession.emoji}
-*Fecha:* ${dateString}
-*Horario:* ${selectedTime}
-
-*Datos del Cliente:*
-Nombre: ${nombre} ${apellido}
-Email: ${email}
-Teléfono: ${telefono}
-                
-Por favor, confírmame la disponibilidad. ¡Gracias!`;
-
-                const encodedMessage = encodeURIComponent(message);
-                const whatsappUrl = `https://wa.me/${PROVIDER_WHATSAPP_NUMBER}?text=${encodedMessage}`;
-
-                whatsappLinkFallback.href = whatsappUrl;
-                showStep(5);
-
-                window.location.href = whatsappUrl;
-            });
-
-            showStep(1);
-        });
-    </script>
-</body>
-</html>
+                document.getElementById('legal-modal').
